@@ -1,6 +1,9 @@
 import pgzero, pgzrun, pygame
 import math, sys, random
+from commands.input_handler_player_one import InputHandlerPlayerOne
+from commands.input_handler_player_two import InputHandlerPlayerTwo
 from enum import Enum
+from pgzero import actor
 
 # Check Python version number. sys.version_info gives version as a tuple, e.g. if (3,7,2,'final',0) for version 3.7.2.
 # Unlike many languages, Python can compare two tuples in the same way that you can compare numbers.
@@ -245,6 +248,7 @@ class Bat(Actor):
     def __init__(self, player, move_func=None):
         x = 40 if player == 0 else 760
         y = HALF_HEIGHT
+        #self.y_movement = 0
         super().__init__("blank", (x, y))
 
         self.player = player
@@ -264,6 +268,15 @@ class Bat(Actor):
         # decide when to create a new ball in the centre of the screen - see comments in Game.update for more on this.
         # Finally, it is used in Game.draw to determine when to display a visual effect over the top of the background
         self.timer = 0
+
+    #def move_up(self):
+        #self.y_movement = PLAYER_SPEED
+
+    #def move_down(self):
+        #self.y_movement = -PLAYER_SPEED
+    
+    #def stop(self):
+        #self.y_movement = 0
 
     def update(self):
         self.timer -= 1
@@ -418,7 +431,8 @@ class Game:
         # We don't play any in-game sound effects if player 0 is an AI player - as this means we're on the menu
         # Updated Jan 2022 - some Pygame installations have issues playing ogg sound files. play_sound can skip sound
         # errors without stopping the game, but it previously couldn't be used for menu-only sounds
-        if self.bats[0].move_func != self.bats[0].ai or menu_sound:
+        #if self.bats[0].move_func != self.bats[0].ai or menu_sound:
+        if menu_sound:
             # Pygame Zero allows you to write things like 'sounds.explosion.play()'
             # This automatically loads and plays a file named 'explosion.wav' (or .ogg) from the sounds folder (if
             # such a file exists)
@@ -475,6 +489,8 @@ def update():
             # player 1, and if we're in 2 player mode, the controls function for player 2 (otherwise the
             # 'None' value indicating this player should be computer-controlled)
             state = State.PLAY
+            #controls = [p1_handler]
+            #controls.append(p2_handler if num_players == 2 else None)
             controls = [p1_controls]
             controls.append(p2_controls if num_players == 2 else None)
             game = Game(controls)
@@ -527,6 +543,10 @@ try:
 except Exception:
     # If an error occurs (e.g. no sound device), just ignore it
     pass
+
+#Create input handlers
+p1_handler = InputHandlerPlayerOne()
+p2_handler = InputHandlerPlayerTwo()
 
 # Set the initial game state
 state = State.MENU
